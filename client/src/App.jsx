@@ -12,7 +12,7 @@ import { Web3Context } from "./context/Web3Context";
 const App = () => {
   return (
     <Web3Context>
-      <div className="relative p-4 bg-[#13131a] min-h-screen flex flex-row">
+      <div className="relative p-4 bg-[#fff]] min-h-screen flex flex-row">
         <div className="sm:flex hidden mr-10 relative">
           <Sidebar />
         </div>

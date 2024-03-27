@@ -29,12 +29,12 @@ const Navbar = () => {
   }, [location.pathname]);
 
   return (
-    <div className="flex md:flex-row flex-col-reverse justify-between mb-[35px] gap-6">
-      <div className="rounded-[35px] w-full lg:flex-1 flex flex-row sm:max-w-[458px] py-2 pl-4 pr-2 h-[52px] bg-[#1c1c24]">
+    <div className="flex md:flex-row flex-col-reverse justify-between mb-[35px] gap-6 pb-4 border-b-4 border-[#4acd8d]-500">
+      <div className="rounded-[35px] w-full lg:flex-1 flex flex-row sm:max-w-[458px] py-2 pl-4 pr-2 h-[52px] bg-[#d2d5cd]">
         <input
           type="text"
           placeholder="Search for campaign"
-          className="flex w-full font-epilogue font-normal text-[14px] placeholder:text-[#4b5264] bg-transparent text-white outline-none"
+          className="flex w-full font-epilogue font-normal text-[14px] placeholder:text-[#25272f] bg-transparent  text-black outline-none"
         ></input>
         <div className="w-[72px] h-full rounded-[20px] bg-[#4acd8d] flex items-center justify-center cursor-pointer">
           <img
@@ -49,7 +49,7 @@ const Navbar = () => {
         <CustomButton
           btnType="button"
           title={connectedWallet ? "Create a campaign" : "Connect"}
-          styles={connectedWallet ? "bg-[#1dc071]" : "bg-[#8c6dfd]"}
+          styles={connectedWallet ? "bg-[#1dc071]" : "bg-[#77d465]"}
           handleClick={() => {
             if (connectedWallet) navigate("create-campaign");
             else connect();

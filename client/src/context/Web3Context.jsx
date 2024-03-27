@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useContext, createContext, useState, useEffect } from "react";
 import { ethers } from "ethers";
 import abi from "../../../artifacts/contracts/CrowdFunding.sol/CrowdFunding.json";
@@ -131,6 +132,61 @@ export const Web3Context = ({ children }) => {
     }
   };
 
+  const donate = async (id, amount) => {
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      web3State.signer
+    );
+
+    if (contract) {
+      try {
+        console.log("Amount donated: ", amount);
+        console.log("Type of amount: ", typeof amount);
+        console.log("id: ", id);
+
+        // Parse amount as Ether value
+        const data = await contract.donateToCampaign([id], {
+          value: ethers.utils.parseEther(amount.toString()),
+        });
+
+        return data;
+      } catch (error) {
+        console.log("Error while donate: ", error);
+      }
+    }
+  };
+
+  const getDonations = async (id) => {
+    const provider = new ethers.providers.JsonRpcProvider();
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      provider
+    );
+
+    if (contract) {
+      try {
+        const data = await contract.getDonators([id]);
+        console.log(data);
+        const numberOfDonations = data[0].length;
+
+        const parsedDonations = [];
+
+        for (let i = 0; i < numberOfDonations; i++) {
+          parsedDonations.push({
+            donator: data[0][i],
+            donation: ethers.utils.formatEther(data[1][i].toString()),
+          });
+        }
+
+        return parsedDonations;
+      } catch (error) {
+        console.log("Error while getting donations: ", error);
+      }
+    }
+  };
+
   const connect = async () => {
     console.log("Connecting...");
     const account = await window.ethereum.request({
@@ -169,6 +225,8 @@ export const Web3Context = ({ children }) => {
         getAllCampaigns,
         getPersonalCampaigns,
         connectedWallet: currentAccount,
+        donate,
+        getDonations,
       }}
     >
       {children}

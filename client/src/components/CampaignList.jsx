@@ -11,7 +11,7 @@ const CampaignList = ({ title, isLoading, data }) => {
 
   return (
     <div>
-      <h1 className="font-semibold text-white text-[20px]">
+      <h1 className="font-semibold text text-[30px]">
         {title} ({data.length})
       </h1>
 

@@ -8,7 +8,7 @@ const FundCard = ({ data, handleClick }) => {
 
   return (
     <div
-      className="sm:w-[288px] w-full rounded-[15px] bg-[#1c1c24] cursor-pointer"
+      className="sm:w-[288px] w-full rounded-[15px] bg-[#ffffff] cursor-pointer shadow-[rgba(0,_0,_0,_0.25)_0px_25px_50px_-12px]"
       onClick={handleClick}
     >
       <img
@@ -30,7 +30,7 @@ const FundCard = ({ data, handleClick }) => {
         </div>
 
         <div className="block">
-          <h3 className="font-semibold text-[16px] text-left text-white leading-[26px]">
+          <h3 className="font-semibold text-[16px] text-left  leading-[26px]">
             {data.title}
           </h3>
           <p className="mt-[5px] font-normal text-[#808191] text-left leading-[18px] truncate">
@@ -40,18 +40,18 @@ const FundCard = ({ data, handleClick }) => {
 
         <div className="flex justify-between flex-wrap mt-[15px] gap-2">
           <div className="flex flex-col">
-            <h4 className="font-semibold text-[14px] text-[#b2b3bd] leading-[22px]">
+            <h4 className="font-semibold text-[14px] leading-[22px]">
               {data.collected}
             </h4>
-            <p className="mt-[3px] font-normal text-[12px] leading-[18px] text-[#808191] sm:max-w-[120px] truncate">
+            <p className="mt-[3px] font-normal text-[12px] leading-[18px] sm:max-w-[120px] truncate">
               Target of {data.target}
             </p>
           </div>
           <div className="flex flex-col">
-            <h4 className="font-semibold text-[14px] text-[#b2b3bd] leading-[22px]">
+            <h4 className="font-semibold text-[14px]  leading-[22px]">
               {remainingDays}
             </h4>
-            <p className="mt-[3px] font-normal text-[12px] leading-[18px] text-[#808191] sm:max-w-[120px] truncate">
+            <p className="mt-[3px] font-normal text-[12px] leading-[18p] sm:max-w-[120px] truncate">
               Remaining Times
             </p>
           </div>

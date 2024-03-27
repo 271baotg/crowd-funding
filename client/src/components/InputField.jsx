@@ -23,7 +23,7 @@ const InputField = ({
           onChange={handleChange}
           placeholder={placeholder}
           rows={10}
-          className="py-[15px] px-[30px] outline-none bg-transparent border-[1px] border-[#3a3a43] text-white rounded-[10px]"
+          className="py-[15px] px-[30px] outline-none bg-transparent border-[1px] border-[#3a3a43]  rounded-[10px]"
         ></textarea>
       ) : (
         <input
@@ -33,7 +33,7 @@ const InputField = ({
           type={inputType}
           step="0.1"
           placeholder={placeholder}
-          className="py-[15px] px-[30px] outline-none bg-transparent border-[1px] border-[#3a3a43] text-white rounded-[10px]"
+          className="py-[15px] px-[30px] outline-none bg-transparent border-[1px] border-[#3a3a43] rounded-[10px]"
         />
       )}
     </label>
