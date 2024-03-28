@@ -7,6 +7,8 @@ import { loader } from "../assets";
 import { calculateBarPercentage, daysLeft } from "../utils";
 import { thirdweb } from "../assets";
 import Context from "../context/Web3Context";
+import { WidthdrawResultModal } from "../components/WidthdrawResultModal";
+import { Modal } from "../components/Modal/Modal";
 
 const CampaignDetail = () => {
   const { state } = useLocation();
@@ -16,6 +18,7 @@ const CampaignDetail = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [amount, setAmount] = useState("");
   const [donators, setDonators] = useState([]);
+  const [isOpenWidthdrawResultModal, setIsOpenWidthdrawResultModal] = useState(false);
 
   useEffect(() => {
     getDonators();
@@ -34,6 +37,12 @@ const CampaignDetail = () => {
     setIsLoading(false);
   };
 
+  const handleWidthdraw = () => {
+    if (state.collected < state.target) {
+      setIsOpenWidthdrawResultModal(true);
+    }
+  }
+
   const remainingDays = daysLeft(state.deadline);
   return (
     <div>
@@ -44,7 +53,14 @@ const CampaignDetail = () => {
           className="w-[100px] h-[100px] object-contain"
         />
       )}
-
+      {isOpenWidthdrawResultModal &&
+        <WidthdrawResultModal
+          title={"This is the title"}
+          closeButton={true}
+          onCloseModal={() => { setIsOpenWidthdrawResultModal(false) }}
+        >
+          <h1>This is body</h1>
+        </WidthdrawResultModal>}
       <div className="w-full flex md:flex-row flex-col mt-10 gap-[30px]">
         <div className="flex-1 flex-col">
           <img
@@ -175,7 +191,7 @@ const CampaignDetail = () => {
                 btnType="button"
                 title="Widthdraw"
                 styles="w-full mt-2 bg-[#c48c39]"
-                handleClick={handleDonate}
+                handleClick={handleWidthdraw}
               />
             </div>
           </div>

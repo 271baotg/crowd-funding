@@ -157,6 +157,10 @@ export const Web3Context = ({ children }) => {
     }
   };
 
+  const widthdraw = () => {
+
+  }
+
   const getDonations = async (id) => {
     const provider = new ethers.providers.JsonRpcProvider();
     const contract = new ethers.Contract(
