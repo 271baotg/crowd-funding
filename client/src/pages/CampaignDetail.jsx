@@ -13,7 +13,7 @@ import { Modal } from "../components/Modal/Modal";
 const CampaignDetail = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { donate, getDonations, contract, address } = useContext(Context);
+  const { donate, getDonations, widthdraw, contract, address } = useContext(Context);
 
   const [isLoading, setIsLoading] = useState(false);
   const [amount, setAmount] = useState("");
@@ -37,8 +37,12 @@ const CampaignDetail = () => {
     setIsLoading(false);
   };
 
-  const handleWidthdraw = () => {
+  const handleWidthdraw = async () => {
     if (state.collected < state.target) {
+      setIsOpenWidthdrawResultModal(true);
+    }
+    else {
+      await widthdraw(state.id);
       setIsOpenWidthdrawResultModal(true);
     }
   }

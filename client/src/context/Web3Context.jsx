@@ -157,9 +157,22 @@ export const Web3Context = ({ children }) => {
     }
   };
 
-  const widthdraw = () => {
-
-  }
+  const widthdraw = async (id) => {
+    // alert(id);
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      web3State.signer
+    );
+    if (contract) {
+      try {
+        // Parse amount as Ether value
+        await contract.widthdraw(id);
+      } catch (error) {
+        console.log("Error while donate: ", error);
+      }
+    }
+  };
 
   const getDonations = async (id) => {
     const provider = new ethers.providers.JsonRpcProvider();
@@ -230,6 +243,7 @@ export const Web3Context = ({ children }) => {
         getPersonalCampaigns,
         connectedWallet: currentAccount,
         donate,
+        widthdraw,
         getDonations,
       }}
     >

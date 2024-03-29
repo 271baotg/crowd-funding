@@ -1,11 +1,16 @@
-export const Modal = ({ isOpen, onCloseModal, children, background, textColor }) => {
+export const Modal = ({ isOpen, onCloseModal, children, background, textColor, duration }) => {
 
+    if (duration) {
+        setTimeout(() => {
+            onCloseModal();
+        }, duration)
+    }
 
     return (
         <div onClick={onCloseModal} tabIndex="-1" aria-hidden="true" className={`justify-center bg-black/20 fixed flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none ${textColor ? textColor : "text-black"}`}>
             <div className="relative mt-7 max-w-2xl max-h-full">
                 {/* <!-- Modal content --> */}
-                <div className={`relative bg-white rounded-lg shadow ${background}`} onClick={(e) => { e.stopPropagation() }}>
+                <div className={`relative rounded-lg shadow ${background}`} onClick={(e) => { e.stopPropagation() }}>
                     {/* <!-- Modal header --> */}
 
                     {/* <!-- Modal body --> */}
@@ -21,7 +26,7 @@ export const Modal = ({ isOpen, onCloseModal, children, background, textColor })
 Modal.Header = ({ title, onClose, closeButton, icon }) => {
     return (
         <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-            <img src={icon} className="size-8"></img>
+            {icon && <img src={icon} className="size-8 mx-5"></img>}
             <h3 className="text-xl font-semibold text-inherit">
                 {title}
             </h3>
