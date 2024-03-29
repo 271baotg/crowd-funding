@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.3;
 
 contract CrowdFunding {
     struct Campaign {
@@ -52,11 +52,11 @@ contract CrowdFunding {
         campaign.donators.push(msg.sender);
         campaign.donations.push(amount);
 
-        (bool sent, ) = payable(campaign.owner).call{value: amount}("");
+        // (bool sent, ) = payable(campaign.owner).call{value: amount}("");
 
-        if (sent) {
-            campaign.collected = campaign.collected + amount;
-        }
+        // if (sent) {
+        campaign.collected = campaign.collected + amount;
+        // }
     }
 
     function getDonators(
@@ -77,6 +77,17 @@ contract CrowdFunding {
         }
 
         return allCampaigns;
+    }
+
+    function widthdraw(uint _contractIndex) public {
+        require(
+            _contractIndex < numberOfCampaign,
+            "Contract index is not valid"
+        );
+        Campaign storage camp = campaigns[_contractIndex];
+        require(msg.sender == camp.owner, "Sender is not the owner");
+        payable(msg.sender).transfer(camp.collected);
+        camp.collected -= camp.collected;
     }
 
     constructor() {}
