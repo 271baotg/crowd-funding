@@ -79,15 +79,26 @@ contract CrowdFunding {
         return allCampaigns;
     }
 
-    function widthdraw(uint _contractIndex) public {
-        require(
-            _contractIndex < numberOfCampaign,
-            "Contract index is not valid"
-        );
-        Campaign storage camp = campaigns[_contractIndex];
+    function widthdraw(uint idx) public {
+        require(idx < numberOfCampaign, "Contract index is not valid");
+        Campaign storage camp = campaigns[idx];
         require(msg.sender == camp.owner, "Sender is not the owner");
         payable(msg.sender).transfer(camp.collected);
         camp.collected -= camp.collected;
+    }
+
+    function returnFund(uint idx) public {
+        Campaign storage camp = campaigns[idx];
+        require(camp.collected >= 0, "This campaign doesn't have any ETH");
+        (address[] memory donators, uint256[] memory donations) = getDonators(
+            idx
+        );
+        for (uint i = 0; i < donators.length; i++) {
+            address donator = donators[i];
+            uint256 amount = donations[i];
+            payable(donator).transfer(amount);
+            camp.collected -= amount;
+        }
     }
 
     constructor() {}
