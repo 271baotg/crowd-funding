@@ -169,10 +169,26 @@ export const Web3Context = ({ children }) => {
         // Parse amount as Ether value
         await contract.widthdraw(id);
       } catch (error) {
-        console.log("Error while donate: ", error);
+        console.log("Error while widthdraw: ", error);
       }
     }
   };
+
+  const returnFund = async (id) => {
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      web3State.signer
+    );
+
+    if (contract) {
+      try {
+        await contract.returnFund(id);
+      } catch (error) {
+        console.log("Error while return fund", error);
+      }
+    }
+  }
 
   const getDonations = async (id) => {
     const provider = new ethers.providers.JsonRpcProvider();
@@ -245,6 +261,7 @@ export const Web3Context = ({ children }) => {
         donate,
         widthdraw,
         getDonations,
+        returnFund,
       }}
     >
       {children}

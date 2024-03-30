@@ -13,7 +13,7 @@ import { Modal } from "../components/Modal/Modal";
 const CampaignDetail = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { donate, getDonations, widthdraw, contract, address } = useContext(Context);
+  const { donate, getDonations, widthdraw, returnFund, contract, address } = useContext(Context);
 
   const [isLoading, setIsLoading] = useState(false);
   const [amount, setAmount] = useState("");
@@ -45,6 +45,10 @@ const CampaignDetail = () => {
       await widthdraw(state.id);
       setIsOpenWidthdrawResultModal(true);
     }
+  }
+
+  const handleReturn = async () => {
+    await returnFund(state.id);
   }
 
   const remainingDays = daysLeft(state.deadline);
@@ -197,6 +201,13 @@ const CampaignDetail = () => {
                 styles="w-full mt-2 bg-[#c48c39]"
                 handleClick={handleWidthdraw}
               />
+              <CustomButton
+                btnType="button"
+                title="Return fund"
+                styles="w-full mt-2 bg-red-500"
+                handleClick={handleReturn}
+              />
+
             </div>
           </div>
         </div>
