@@ -7,6 +7,7 @@ import CustomButton from "../components/CustomButton";
 import InputField from "../components/InputField";
 import { checkIfImage } from "../utils";
 import Context, { Web3Context } from "../context/Web3Context";
+import { Modal } from "../components/Modal/Modal";
 
 const CreateCampaign = () => {
   const navigate = useNavigate();
@@ -159,7 +160,31 @@ const CreateCampaign = () => {
           />
         </div>
 
-        {isOpen && (
+        {
+          isOpen && (
+            <Modal onCloseModal={() => { () => { setIsOpen(false) } }} background={"bg-gray-800"} textColor={"text-white"}>
+              <Modal.Header title={"New Campaign"} onClose={() => { setIsOpen(false) }} closeButton={true}>
+              </Modal.Header>
+              <Modal.Body>
+                <div className="p-4 overflow-y-auto">
+                  <p className="mt-1 text-gray-800 dark:text-gray-400">
+                    Do you want to continue creating a campaign?
+                  </p>
+                </div>
+              </Modal.Body>
+              <Modal.Footer>
+                <button type="button" onClick={() => { setIsOpen(false) }} className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-overlay="#hs-basic-modal">
+                  Cancel
+                </button>
+                <button type="submit" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-green-500 text-white hover:bg-green-700 disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600">
+                  Continue
+                </button>
+              </Modal.Footer>
+            </Modal>
+          )
+        }
+        {/* COMMENT */}
+        {/* {isOpen && false && (
           <div className="fixed inset-0 z-80 flex items-baseline justify-center overflow-x-hidden overflow-y-auto bg-black bg-opacity-50 sm:py-6 sm:px-4 sm:px-0">
             <div className="bg-white dark:bg-gray-800 sm:max-w-lg sm:w-full rounded-xl shadow-sm">
               <div className="flex justify-between items-center py-3 px-4 border-b dark:border-gray-700">
@@ -186,7 +211,7 @@ const CreateCampaign = () => {
               </div>
             </div>
           </div>
-        )}
+        )} */}
       </form>
 
       {isSuccess && (

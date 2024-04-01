@@ -7,8 +7,8 @@ export const Modal = ({ isOpen, onCloseModal, children, background, textColor, d
     }
 
     return (
-        <div onClick={onCloseModal} tabIndex="-1" aria-hidden="true" className={`justify-center bg-black/20 fixed flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none ${textColor ? textColor : "text-black"}`}>
-            <div className="relative mt-7 max-w-2xl max-h-full">
+        <div onClick={onCloseModal} tabIndex="-1" aria-hidden="true" className={`fixed inset-0 z-80 flex items-baseline justify-center overflow-x-hidden overflow-y-auto bg-black bg-opacity-50 sm:py-6 sm:px-4 sm:px-0 ${textColor ? textColor : "text-black"}`}>
+            <div className="bg-white dark:bg-gray-800 sm:max-w-lg sm:w-full rounded-xl shadow-sm">
                 {/* <!-- Modal content --> */}
                 <div className={`relative rounded-lg shadow ${background}`} onClick={(e) => { e.stopPropagation() }}>
                     {/* <!-- Modal header --> */}
@@ -60,7 +60,7 @@ Modal.Body = ({ background, children }) => {
 
 Modal.Footer = ({ background, children }) => {
     return (
-        <div className={`flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600 ${background}`}>
+        <div className={`flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-gray-700 ${background}`}>
             {children}
         </div>
     )
