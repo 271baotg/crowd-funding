@@ -127,8 +127,10 @@ export const Web3Context = ({ children }) => {
         form.image
       );
       console.log("Campaign succesfully created: ", newCampaign);
+      return true;
     } catch (error) {
       console.log("Campaign succesfully failure: ", error);
+      return false;
     }
   };
 

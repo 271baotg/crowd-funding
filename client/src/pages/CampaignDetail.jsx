@@ -35,6 +35,7 @@ const CampaignDetail = () => {
     setIsLoading(true);
     await donate(state.id, amount);
     setIsLoading(false);
+    getDonators();
   };
 
   const handleWidthdraw = async () => {
@@ -136,21 +137,32 @@ const CampaignDetail = () => {
           <div>
             <h4 className="font-semibold text-[18px] uppercase">Donators</h4>
 
-            <div className="mt-[20px] flex flex-col gap-4">
+            <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-[20px] flex flex-col gap-4 ">
               {donators.length > 0 ? (
-                donators.map((item, index) => (
-                  <div
-                    key={`${item[index]}-${index}`}
-                    className="flex justify-between items-center gap-4"
-                  >
-                    <p className="font-epilogue font-normal text-[16px] leading-[26px] break-ll">
-                      {index + 1}. {item.donator}
-                    </p>
-                    <p className="font-epilogue font-normal text-[16px] leading-[26px] break-ll">
-                      {item.donation}
-                    </p>
-                  </div>
-                ))
+                <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                      <th scope="col" className="px-6 py-3">
+                        Wallet address
+                      </th>
+                      <th scope="col" className="px-6 py-3">
+                        Donator
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {donators.map((item, index) => (
+                      <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700" key={`${item}-${index}`}>
+                        <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                          {index + 1}. {item.donator}
+                        </td>
+                        <td className="px-6 py-4">
+                          {item.donation} (ETH)
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               ) : (
                 <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] text-justify">
                   No donators yet. Be the first one!
@@ -212,7 +224,7 @@ const CampaignDetail = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
