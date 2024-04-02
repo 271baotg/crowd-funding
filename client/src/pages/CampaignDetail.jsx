@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
 import CustomButton from "../components/CustomButton";
 import CountBox from "../components/CountBox";
-import { loader } from "../assets";
+import { closed, loader } from "../assets";
 import { calculateBarPercentage, daysLeft } from "../utils";
 import { thirdweb } from "../assets";
 import Context from "../context/Web3Context";
@@ -19,6 +19,31 @@ const CampaignDetail = () => {
   const [amount, setAmount] = useState("");
   const [donators, setDonators] = useState([]);
   const [isOpenWidthdrawResultModal, setIsOpenWidthdrawResultModal] = useState(false);
+
+  let campaignStateStyle = "";
+  const setCampaignStyle = () => {
+    switch (state.state) {
+      case 0: {
+        campaignStateStyle = "text-2xl font-bold text-yellow-500";
+        break;
+      }
+      case 1: {
+        campaignStateStyle = "text-2xl font-bold text-[#1dc071] italic";
+        break;
+      }
+      case 2: {
+        campaignStateStyle = "text-2xl font-bold text-[#FF0000] italic";
+        break;
+      }
+      default: {
+
+      }
+    }
+  }
+  setCampaignStyle();
+
+  let campaignStateElement = (<span className={campaignStateStyle}>{state.state == 0 ? "Chưa sẵn sàng" : (state.state == 1 ? "Chạy" : "Đã kết thúc")}</span>);
+
 
   useEffect(() => {
     getDonators();
@@ -70,7 +95,13 @@ const CampaignDetail = () => {
         >
           <h1>This is body</h1>
         </WidthdrawResultModal>}
-      <div className="w-full flex md:flex-row flex-col mt-10 gap-[30px]">
+      <div className="mt-5 mb-2">
+        <h1 className="text-xl">
+          Trạng thái: &nbsp;{campaignStateElement}
+        </h1>
+      </div>
+      <div className="w-full flex md:flex-row flex-col gap-[30px]">
+
         <div className="flex-1 flex-col">
           <img
             src={state.image}
@@ -177,7 +208,7 @@ const CampaignDetail = () => {
             Fund
           </h4>
 
-          <div className="mt-[20px] flex flex-col p-4 bg-[#4acd8d] rounded-[10px]">
+          <div className={`mt-[20px] flex flex-col p-4 ${state.state == 1 ? "bg-[#4acd8d]" : "bg-[#36664f]"} rounded-[10px]`}>
             <p className="font-epilogue fount-medium text-[20px] leading-[30px] font-semibold text-center text-[#fff]">
               Fund the campaign
             </p>
@@ -191,7 +222,7 @@ const CampaignDetail = () => {
                 onChange={(e) => setAmount(e.target.value)}
               />
 
-              <div className="my-[20px] p-4 bg-[#f1f1f4] rounded-[10px]">
+              <div className={`my-[20px] p-4 bg-[#f1f1f4] rounded-[10px]`}>
                 <h4 className="font-epilogue font-semibold text-[14px] leading-[22px] ">
                   Back it because you believe in it.
                 </h4>
@@ -204,13 +235,15 @@ const CampaignDetail = () => {
               <CustomButton
                 btnType="button"
                 title="Fund Campaign"
-                styles="w-full bg-[#284f52]"
+                styles={`w-full bg-[#284f52] disable: bg-[#0d191a]`}
+                isDisable={state.state == 1 ? false : true} //not ready = 0, running = 1, ended = 2
                 handleClick={handleDonate}
               />
               <CustomButton
                 btnType="button"
                 title="Widthdraw"
-                styles="w-full mt-2 bg-[#c48c39]"
+                styles="w-full mt-2 bg-[#c48c39] disable: bg-[#5e431b]"
+                isDisable={state.state == 1 ? false : true}
                 handleClick={handleWidthdraw}
               />
               <CustomButton
@@ -219,7 +252,6 @@ const CampaignDetail = () => {
                 styles="w-full mt-2 bg-red-500"
                 handleClick={handleReturn}
               />
-
             </div>
           </div>
         </div>

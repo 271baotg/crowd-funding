@@ -62,6 +62,7 @@ export const Web3Context = ({ children }) => {
           collected: ethers.utils.formatEther(campaign.collected.toString()),
           image: campaign.image,
           id: i,
+          state: campaign.state,
         }));
         return parsedResult;
       } catch (error) {
