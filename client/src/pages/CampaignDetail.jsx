@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
 import CustomButton from "../components/CustomButton";
 import CountBox from "../components/CountBox";
-import { closed, loader } from "../assets";
+import { loader } from "../assets";
 import { calculateBarPercentage, daysLeft } from "../utils";
 import { thirdweb } from "../assets";
 import Context from "../context/Web3Context";
@@ -208,7 +208,7 @@ const CampaignDetail = () => {
             Fund
           </h4>
 
-          <div className={`mt-[20px] flex flex-col p-4 ${state.state == 1 ? "bg-[#4acd8d]" : "bg-[#36664f]"} rounded-[10px]`}>
+          <div className={`mt-[20px] flex flex-col p-4 bg-[#4acd8d] rounded-[10px]`}>
             <p className="font-epilogue fount-medium text-[20px] leading-[30px] font-semibold text-center text-[#fff]">
               Fund the campaign
             </p>
@@ -235,21 +235,22 @@ const CampaignDetail = () => {
               <CustomButton
                 btnType="button"
                 title="Fund Campaign"
-                styles={`w-full bg-[#284f52] disable: bg-[#0d191a]`}
+                styles={`w-full mt-2 bg-[#c48c39] ${state.state != 1 && "bg-[#E8E8E8] text-[#909090]"}`}
                 isDisable={state.state == 1 ? false : true} //not ready = 0, running = 1, ended = 2
                 handleClick={handleDonate}
               />
               <CustomButton
                 btnType="button"
                 title="Widthdraw"
-                styles="w-full mt-2 bg-[#c48c39] disable: bg-[#5e431b]"
+                styles={`w-full mt-2 bg-[#284f52] ${state.state != 1 && "bg-[#E8E8E8] text-[#909090]"}`}
                 isDisable={state.state == 1 ? false : true}
                 handleClick={handleWidthdraw}
               />
               <CustomButton
                 btnType="button"
                 title="Return fund"
-                styles="w-full mt-2 bg-red-500"
+                styles={`w-full mt-2 bg-red-500 ${state.state != 1 && "bg-[#E8E8E8] text-[#909090]"}`}
+                isDisable={state.state == 1 ? false : true}
                 handleClick={handleReturn}
               />
             </div>
