@@ -36,6 +36,31 @@ const CampaignDetail = () => {
   const [isReturnFund, setIsReturnFund] = useState(false);
 
 
+  let campaignStateStyle = "";
+  const setCampaignStyle = () => {
+    switch (campaign.state) {
+      case 0: {
+        campaignStateStyle = "text-2xl font-bold text-yellow-500";
+        break;
+      }
+      case 1: {
+        campaignStateStyle = "text-2xl font-bold text-[#1dc071] italic";
+        break;
+      }
+      case 2: {
+        campaignStateStyle = "text-2xl font-bold text-[#FF0000] italic";
+        break;
+      }
+      default: {
+
+      }
+    }
+  }
+  setCampaignStyle();
+
+  let campaignStateElement = (<span className={campaignStateStyle}>{campaign.state == 0 ? "Chưa sẵn sàng" : (campaign.state == 1 ? "Đang mở" : "Đã kết thúc")}</span>);
+
+
   useEffect(() => {
     getDonators();
     getCampaignDetail();
@@ -45,6 +70,7 @@ const CampaignDetail = () => {
   const getCampaignDetail = async () => {
     try {
       const data = await getCampaignById(state.id);
+      console.log("Detail: ", data);
       setCampaign(data);
     } catch (error) {
       console.log("Cannot get campaign detail");
@@ -122,6 +148,11 @@ const CampaignDetail = () => {
   const remainingDays = daysLeft(campaign.deadline);
   return (
     <div>
+      <div className="mt-5 mb-2">
+        <h1 className="text-xl">
+          Trạng thái: &nbsp;{campaignStateElement}
+        </h1>
+      </div>
       {isOpenWidthdrawResultModal &&
         <WidthdrawResultModal
           title={"This is the title"}
@@ -386,7 +417,7 @@ const CampaignDetail = () => {
             Fund
           </h4>
 
-          <div className="mt-[20px] flex flex-col p-4 bg-[#4acd8d] rounded-[10px]">
+          <div className={`mt-[20px] flex flex-col p-4 bg-[#4acd8d] rounded-[10px]`}>
             <p className="font-epilogue fount-medium text-[20px] leading-[30px] font-semibold text-center text-[#fff]">
               Fund the campaign
             </p>
@@ -400,7 +431,7 @@ const CampaignDetail = () => {
                 onChange={(e) => setAmount(e.target.value)}
               />
 
-              <div className="my-[20px] p-4 bg-[#f1f1f4] rounded-[10px]">
+              <div className={`my-[20px] p-4 bg-[#f1f1f4] rounded-[10px]`}>
                 <h4 className="font-epilogue font-semibold text-[14px] leading-[22px] ">
                   Back it because you believe in it.
                 </h4>
@@ -413,20 +444,23 @@ const CampaignDetail = () => {
               <CustomButton
                 btnType="button"
                 title="Fund Campaign"
-                styles="w-full bg-[#284f52]"
                 handleClick={() => { setIsOpen(!isOpen) }
                 }
+                styles={`w-full mt-2  ${campaign.state != 1 ? `bg-[#E8E8E8] text-[#909090]` : `bg-[#c48c39]`}`}
+                isDisable={campaign.state == 1 ? false : true} //not ready = 0, running = 1, ended = 2
               />
               <CustomButton
                 btnType="button"
                 title="Widthdraw"
-                styles="w-full mt-2 bg-[#c48c39]"
+                styles={`w-full mt-2  ${campaign.state != 1 ? "bg-[#E8E8E8] text-[#909090]" : `bg-[#284f52]`}`}
+                isDisable={campaign.state == 1 ? false : true}
                 handleClick={handleWidthdraw}
               />
               <CustomButton
                 btnType="button"
                 title="Return fund"
-                styles="w-full mt-2 bg-red-500"
+                styles={`w-full mt-2  ${campaign.state != 1 ? "bg-[#E8E8E8] text-[#909090]" : `bg-red-500`}`}
+                isDisable={campaign.state == 1 ? false : true}
                 handleClick={handleReturn}
               />
             </div>

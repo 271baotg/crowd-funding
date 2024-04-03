@@ -60,6 +60,7 @@ export const Web3Context = ({ children }) => {
           target: ethers.utils.formatEther(campaign.target.toString()),
           deadline: campaign.deadline.toNumber(),
           collected: ethers.utils.formatEther(campaign.collected.toString()),
+          state: campaign.state,
           image: campaign.image,
         };
         return parsedResult;
@@ -111,6 +112,7 @@ export const Web3Context = ({ children }) => {
           collected: ethers.utils.formatEther(campaign.collected.toString()),
           image: campaign.image,
           id: i,
+          state: campaign.state,
         }));
         return parsedResult;
       } catch (error) {
@@ -142,6 +144,7 @@ export const Web3Context = ({ children }) => {
           deadline: campaign.deadline.toNumber(),
           collected: ethers.utils.formatEther(campaign.collected.toString()),
           image: campaign.image,
+          state: campaign.state,
           id: i,
         }));
 

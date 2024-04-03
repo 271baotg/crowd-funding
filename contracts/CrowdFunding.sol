@@ -2,6 +2,12 @@
 pragma solidity ^0.8.3;
 
 contract CrowdFunding {
+    enum CAMPAIGN_STATE {
+        NOT_READY,
+        RUNNING,
+        ENDED
+    }
+
     struct Campaign {
         address owner;
         string title;
@@ -12,6 +18,7 @@ contract CrowdFunding {
         string image;
         address[] donators;
         uint256[] donations;
+        CAMPAIGN_STATE state;
     }
 
     struct Record {
@@ -49,6 +56,7 @@ contract CrowdFunding {
         campaign.target = _target;
         campaign.deadline = _deadline;
         campaign.image = _image;
+        campaign.state = CAMPAIGN_STATE.RUNNING;
 
         record.sender = _owner;
         record.tag = "create_campaign";
@@ -63,8 +71,6 @@ contract CrowdFunding {
     }
 
     function donateToCampaign(uint256 _id) public payable {
-        uint256 amount = msg.value;
-
         Campaign storage campaign = campaigns[_id];
         Record storage record = records[numberOfRecord];
 
@@ -75,6 +81,13 @@ contract CrowdFunding {
         record.timestamp = block.timestamp;
 
         numberOfRecord++;
+
+        require(
+            campaign.state == CAMPAIGN_STATE.RUNNING,
+            "Campaign is not running"
+        );
+
+        uint256 amount = msg.value;
 
         campaign.donators.push(msg.sender);
         campaign.donations.push(amount);
@@ -137,10 +150,15 @@ contract CrowdFunding {
         payable(msg.sender).transfer(camp.collected);
 
         camp.collected -= camp.collected;
+        camp.state = CAMPAIGN_STATE.ENDED;
     }
 
     function returnFund(uint idx) public {
         Campaign storage camp = campaigns[idx];
+        require(
+            camp.owner == msg.sender,
+            "Sender is not campaign's owner - ERROR BY AN"
+        );
         require(camp.collected >= 0, "This campaign doesn't have any ETH");
         (address[] memory donators, uint256[] memory donations) = getDonators(
             idx
@@ -151,6 +169,7 @@ contract CrowdFunding {
             payable(donator).transfer(amount);
             camp.collected -= amount;
         }
+        camp.state = CAMPAIGN_STATE.ENDED;
     }
 
     constructor() {}
