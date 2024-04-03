@@ -1,14 +1,14 @@
 import { useLocation } from "react-router-dom";
 import { Modal } from "./Modal/Modal";
-import { warning } from "../../src/assets";
-import { successful } from "../../src/assets";
+import { warning } from "../assets";
+import { successful } from "../assets";
 
-export const WidthdrawResultModal = ({ isOpen, onCloseModal, isWidthdraw }) => {
+export const ReturnFundResultModal = ({ isOpen, onCloseModal, isReturnFund }) => {
     const handleOnCloseModal = () => {
         onCloseModal();
     }
 
-    if (!isWidthdraw) {
+    if (!isReturnFund) {
         return (
             <Modal
                 onCloseModal={onCloseModal}
@@ -16,12 +16,12 @@ export const WidthdrawResultModal = ({ isOpen, onCloseModal, isWidthdraw }) => {
                 textColor={"text-black"}
             >
                 <Modal.Header
-                    title={"Withdrawal failed"}
+                    title={"Return fund failed"}
                     onClose={handleOnCloseModal}
                     closeButton={true}
                 ></Modal.Header>
                 <Modal.Body>
-                    <div className="p-4 overflow-y-auto flex ">
+                    <div className="p-4 overflow-y-auto flex">
                         <svg
                             className="flex-shrink-0 w-5 text-red-500 align-center h-5 me-2"
                             aria-hidden="true"
@@ -32,7 +32,7 @@ export const WidthdrawResultModal = ({ isOpen, onCloseModal, isWidthdraw }) => {
                             <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
                         </svg>
                         <p className="text-center m-auto text-red-500">
-                            You encountered an issue during the withdrawal process
+                            You encountered an issue during the fund return process
                         </p>
                     </div>
                 </Modal.Body>
@@ -58,7 +58,7 @@ export const WidthdrawResultModal = ({ isOpen, onCloseModal, isWidthdraw }) => {
             textColor={"text-black"}
         >
             <Modal.Header
-                title={"Withdrawal successful"}
+                title={"Return of funds successful"}
                 onClose={handleOnCloseModal}
                 closeButton={true}
             ></Modal.Header>
@@ -74,7 +74,7 @@ export const WidthdrawResultModal = ({ isOpen, onCloseModal, isWidthdraw }) => {
                         <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
                     </svg>
                     <p className="text-center m-auto text-green-500">
-                        You have successfully withdrawn money to your wallet.
+                        You successfully returned funds to all donors
                     </p>
                 </div>
             </Modal.Body>

@@ -9,6 +9,7 @@ import { thirdweb } from "../assets";
 import Context from "../context/Web3Context";
 import { WidthdrawResultModal } from "../components/WidthdrawResultModal";
 import { Modal } from "../components/Modal/Modal";
+import { ReturnFundResultModal } from "../components/ReturnFundResultModal";
 
 const CampaignDetail = () => {
   const { state } = useLocation();
@@ -19,6 +20,14 @@ const CampaignDetail = () => {
   const [amount, setAmount] = useState("");
   const [donators, setDonators] = useState([]);
   const [isOpenWidthdrawResultModal, setIsOpenWidthdrawResultModal] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [status, setStatus] = useState("");
+  const [isError, setIsError] = useState(false);
+  const [isOpenReturnFund, setIsOpenReturnFund] = useState(false);
+  const [isWidthdraw, setIsWidthdraw] = useState(false);
+  const [isReturnFund, setIsReturnFund] = useState(false);
+
 
   useEffect(() => {
     getDonators();
@@ -33,43 +42,219 @@ const CampaignDetail = () => {
 
   const handleDonate = async () => {
     setIsLoading(true);
-    await donate(state.id, amount);
-    setIsLoading(false);
-    getDonators();
+    try {
+      const result = await donate(state.id, amount);
+      if (result != false) {
+        setStatus("Campaign funding succeeded");
+        setIsSuccess(true);
+        setTimeout(() => {
+          setIsSuccess(false);
+        }, 5000);
+      }
+      if (result == false) {
+        setStatus("Campaign funding failed");
+        setIsError(true);
+        setTimeout(() => {
+          setIsError(false);
+        }, 5000);
+      }
+    } catch (error) {
+      setStatus("Campaign funding error");
+      setIsError(true);
+      setTimeout(() => {
+        setIsError(false);
+      }, 3000);
+    } finally {
+      setIsLoading(false);
+      setIsOpen(false);
+      getDonators();
+    }
   };
 
   const handleWidthdraw = async () => {
     if (state.collected < state.target) {
       setIsOpenWidthdrawResultModal(true);
+      setIsWidthdraw(false);
     }
     else {
-      await widthdraw(state.id);
+      const result = await widthdraw(state.id);
+      if (result) {
+        setIsWidthdraw(true);
+      } else {
+        setIsWidthdraw(false);
+      }
+
       setIsOpenWidthdrawResultModal(true);
     }
   }
 
   const handleReturn = async () => {
-    await returnFund(state.id);
+    const result = await returnFund(state.id);
+    if (result) {
+      setIsReturnFund(true);
+    } else {
+      setIsReturnFund(false);
+    }
+    setIsOpenReturnFund(true);
   }
 
   const remainingDays = daysLeft(state.deadline);
   return (
     <div>
-      {isLoading && (
-        <img
-          src={loader}
-          alt="loading"
-          className="w-[100px] h-[100px] object-contain"
-        />
-      )}
       {isOpenWidthdrawResultModal &&
         <WidthdrawResultModal
           title={"This is the title"}
+          isWidthdraw={isWidthdraw}
           closeButton={true}
           onCloseModal={() => { setIsOpenWidthdrawResultModal(false) }}
         >
           <h1>This is body</h1>
-        </WidthdrawResultModal>}
+        </WidthdrawResultModal>
+      }
+
+      {isOpenReturnFund &&
+        <ReturnFundResultModal
+          title={"This is the title"}
+          isReturnFund={isReturnFund}
+          closeButton={true}
+          onCloseModal={() => { setIsOpenReturnFund(false) }}
+        >
+          <h1>This is body</h1>
+        </ReturnFundResultModal>
+      }
+
+      {isOpen && (
+        <Modal
+          onCloseModal={() => {
+            () => {
+              setIsOpen(false);
+            };
+          }}
+          background={"bg-white"}
+          textColor={"text-black"}
+        >
+          <Modal.Header
+            title={"Fund Campaign"}
+            onClose={() => {
+              setIsOpen(false);
+            }}
+            closeButton={true}
+          ></Modal.Header>
+          <Modal.Body>
+            <div className="p-4 overflow-y-auto">
+              {isLoading && (
+                <div>
+                  <img
+                    src={loader}
+                    alt="loading"
+                    className="w-[100px] h-[100px] m-auto object-contain"
+                  />
+                  <div className="m-auto text-center">
+                    <h3 className="text-[#1dc071] text-[24px] font-semibold">
+                      Wating for confirm ...
+                    </h3>
+                  </div>
+                </div>
+              )}
+              <p className="mt-1 text-black text-center m-auto">
+                Do you want to continue the fundraising campaign?
+              </p>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+              }}
+              className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+              data-hs-overlay="#hs-basic-modal"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleDonate}
+              className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-green-500 text-white hover:bg-green-700 disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+            >
+              Continue
+            </button>
+          </Modal.Footer>
+        </Modal>
+      )}
+
+      {isSuccess && (
+        <div className="fixed inset-0 z-80 flex items-baseline justify-end overflow-x-hidden overflow-y-auto sm:py-6 sm:px-4 sm:px-0">
+          <div
+            id="alert-additional-content-3"
+            className=" p-4 mb-4 text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800"
+            role="alert"
+          >
+            <div className="flex items-center">
+              <svg
+                className="flex-shrink-0 w-4 h-4 me-2"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+              </svg>
+              <span className="sr-only">Info</span>
+              <h3 className="text-lg font-medium">Success</h3>
+            </div>
+            <div className="mt-2 mb-4 text-sm">{status}</div>
+            <div className="flex">
+              <button
+                type="button"
+                onClick={() => { setIsSuccess(false) }}
+                className="text-green-800 bg-transparent border border-green-800 hover:bg-green-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center dark:hover:bg-green-600 dark:border-green-600 dark:text-green-400 dark:hover:text-white dark:focus:ring-green-800"
+                data-dismiss-target="#alert-additional-content-3"
+                aria-label="Close"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isError && (
+        <div className="fixed inset-0 z-80 flex items-baseline justify-end overflow-x-hidden overflow-y-auto sm:py-6 sm:px-4 sm:px-0">
+          <div
+            id="alert-additional-content-2"
+            className="p-4 mb-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800"
+            role="alert"
+          >
+            <div className="flex items-center">
+              <svg
+                className="flex-shrink-0 w-4 h-4 me-2"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+              </svg>
+              <span className="sr-only">Info</span>
+              <h3 className="text-lg font-medium">Failed</h3>
+            </div>
+            <div className="mt-2 mb-4 text-sm">{status}</div>
+            <div className="flex">
+              <button
+                type="button"
+                onClick={() => setIsError(false)}
+                className="text-red-800 bg-transparent border border-red-800 hover:bg-red-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center dark:hover:bg-red-600 dark:border-red-600 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800"
+                data-dismiss-target="#alert-additional-content-2"
+                aria-label="Close"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="w-full flex md:flex-row flex-col mt-10 gap-[30px]">
         <div className="flex-1 flex-col">
           <img
@@ -205,7 +390,8 @@ const CampaignDetail = () => {
                 btnType="button"
                 title="Fund Campaign"
                 styles="w-full bg-[#284f52]"
-                handleClick={handleDonate}
+                handleClick={() => { setIsOpen(!isOpen) }
+                }
               />
               <CustomButton
                 btnType="button"

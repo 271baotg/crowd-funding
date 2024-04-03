@@ -34,34 +34,33 @@ const CreateCampaign = () => {
   const toggleSuccessAlert = (e) => {
     e.preventDefault();
     setIsSuccess(!isSuccess);
-  }
+  };
 
   const toggleErrorAlert = (e) => {
     e.preventDefault();
     setIsError(!isError);
-  }
+  };
 
   const submitHandler = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    toggleModal(e);
     try {
       const result = await createCampaign({
         ...form,
         target: ethers.utils.parseUnits(form.target, 18),
       });
       if (result) {
-        setStatus("Successfully creating a campaign")
+        setStatus("Successfully creating a campaign");
         setIsSuccess(true);
         setTimeout(() => {
           setIsSuccess(false);
-        }, 3000);
+        }, 5000);
       } else {
         setStatus("Decline to create a campaign");
         setIsError(true);
         setTimeout(() => {
           setIsError(false);
-        }, 3000);
+        }, 5000);
       }
     } catch (error) {
       console.error("Error creating campaign:", error);
@@ -72,6 +71,13 @@ const CreateCampaign = () => {
       }, 3000);
     } finally {
       setIsLoading(false);
+      form.title = "";
+      form.description = "";
+      form.name = "";
+      form.target = "";
+      form.image = "";
+      form.deadline = "";
+      toggleModal(e);
     }
   };
 
@@ -79,10 +85,8 @@ const CreateCampaign = () => {
     setForm({ ...form, [fieldName]: e.target.value });
   };
 
-
   return (
     <div className="bg-[#ffffff] flex justify-center items-center flex-col border-2 border-gray-300 rounded-[10px] sm:p-10 p-4">
-
       {isLoading && (
         <img
           src={loader}
@@ -160,29 +164,64 @@ const CreateCampaign = () => {
           />
         </div>
 
-        {
-          isOpen && (
-            <Modal onCloseModal={() => { () => { setIsOpen(false) } }} background={"bg-gray-800"} textColor={"text-white"}>
-              <Modal.Header title={"New Campaign"} onClose={() => { setIsOpen(false) }} closeButton={true}>
-              </Modal.Header>
-              <Modal.Body>
-                <div className="p-4 overflow-y-auto">
-                  <p className="mt-1 text-gray-800 dark:text-gray-400">
-                    Do you want to continue creating a campaign?
-                  </p>
-                </div>
-              </Modal.Body>
-              <Modal.Footer>
-                <button type="button" onClick={() => { setIsOpen(false) }} className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-overlay="#hs-basic-modal">
-                  Cancel
-                </button>
-                <button type="submit" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-green-500 text-white hover:bg-green-700 disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600">
-                  Continue
-                </button>
-              </Modal.Footer>
-            </Modal>
-          )
-        }
+        {isOpen && (
+          <Modal
+            onCloseModal={() => {
+              () => {
+                setIsOpen(false);
+              };
+            }}
+            background={"bg-white"}
+            textColor={"text-black"}
+          >
+            <Modal.Header
+              title={"New Campaign"}
+              onClose={() => {
+                setIsOpen(false);
+              }}
+              closeButton={true}
+            ></Modal.Header>
+            <Modal.Body>
+              <div className="p-4 overflow-y-auto">
+                {isLoading && (
+                  <div>
+                    <img
+                      src={loader}
+                      alt="loading"
+                      className="w-[100px] h-[100px] m-auto object-contain"
+                    />
+                    <div className="m-auto text-center">
+                      <h3 className="text-[#1dc071] text-[24px] font-semibold">
+                        Wating for confirm ...
+                      </h3>
+                    </div>
+                  </div>
+                )}
+                <p className="mt-1 text-black text-center m-auto">
+                  Do you want to continue creating a campaign?
+                </p>
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                }}
+                className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+                data-hs-overlay="#hs-basic-modal"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-green-500 text-white hover:bg-green-700 disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
+              >
+                Continue
+              </button>
+            </Modal.Footer>
+          </Modal>
+        )}
         {/* COMMENT */}
         {/* {isOpen && false && (
           <div className="fixed inset-0 z-80 flex items-baseline justify-center overflow-x-hidden overflow-y-auto bg-black bg-opacity-50 sm:py-6 sm:px-4 sm:px-0">
@@ -202,7 +241,7 @@ const CreateCampaign = () => {
                 </p>
               </div>
               <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-gray-700">
-                <button type="button" onClick={toggleModal} className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-overlay="#hs-basic-modal">
+<button type="button" onClick={toggleModal} className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-overlay="#hs-basic-modal">
                   Cancel
                 </button>
                 <button type="submit" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-green-500 text-white hover:bg-green-700 disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600">
@@ -216,25 +255,49 @@ const CreateCampaign = () => {
 
       {isSuccess && (
         <div className="fixed inset-0 z-80 flex items-baseline justify-end overflow-x-hidden overflow-y-auto sm:py-6 sm:px-4 sm:px-0">
-          <div id="alert-additional-content-3" className=" p-4 mb-4 text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800" role="alert">
+          <div
+            id="alert-additional-content-3"
+            className=" p-4 mb-4 text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800"
+            role="alert"
+          >
             <div className="flex items-center">
-              <svg className="flex-shrink-0 w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+              <svg
+                className="flex-shrink-0 w-4 h-4 me-2"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
               </svg>
               <span className="sr-only">Info</span>
               <h3 className="text-lg font-medium">Success</h3>
             </div>
-            <div className="mt-2 mb-4 text-sm">
-              {Status}
-            </div>
+            <div className="mt-2 mb-4 text-sm">{Status}</div>
             <div className="flex">
-              <button type="button" className="text-white bg-green-800 hover:bg-green-900 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs px-3 py-1.5 me-2 text-center inline-flex items-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                <svg className="me-2 h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
+              <button
+                type="button"
+                onClick={navigate("/")}
+                className="text-white bg-green-800 hover:bg-green-900 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs px-3 py-1.5 me-2 text-center inline-flex items-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+              >
+                <svg
+                  className="me-2 h-3 w-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 14"
+                >
                   <path d="M10 0C4.612 0 0 5.336 0 7c0 1.742 3.546 7 10 7 6.454 0 10-5.258 10-7 0-1.664-4.612-7-10-7Zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
                 </svg>
                 View more
               </button>
-              <button type="button" onClick={toggleSuccessAlert} className="text-green-800 bg-transparent border border-green-800 hover:bg-green-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center dark:hover:bg-green-600 dark:border-green-600 dark:text-green-400 dark:hover:text-white dark:focus:ring-green-800" data-dismiss-target="#alert-additional-content-3" aria-label="Close">
+              <button
+                type="button"
+                onClick={toggleSuccessAlert}
+                className="text-green-800 bg-transparent border border-green-800 hover:bg-green-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center dark:hover:bg-green-600 dark:border-green-600 dark:text-green-400 dark:hover:text-white dark:focus:ring-green-800"
+                data-dismiss-target="#alert-additional-content-3"
+                aria-label="Close"
+              >
                 Dismiss
               </button>
             </div>
@@ -244,26 +307,39 @@ const CreateCampaign = () => {
 
       {isError && (
         <div className="fixed inset-0 z-80 flex items-baseline justify-end overflow-x-hidden overflow-y-auto sm:py-6 sm:px-4 sm:px-0">
-          <div id="alert-additional-content-2" className="p-4 mb-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+          <div
+            id="alert-additional-content-2"
+            className="p-4 mb-4 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800"
+            role="alert"
+          >
             <div className="flex items-center">
-              <svg className="flex-shrink-0 w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+              <svg
+                className="flex-shrink-0 w-4 h-4 me-2"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
               </svg>
               <span className="sr-only">Info</span>
               <h3 className="text-lg font-medium">Failed</h3>
             </div>
-            <div className="mt-2 mb-4 text-sm">
-              {Status}
-            </div>
+            <div className="mt-2 mb-4 text-sm">{Status}</div>
             <div className="flex">
-              <button type="button" onClick={toggleErrorAlert} className="text-red-800 bg-transparent border border-red-800 hover:bg-red-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center dark:hover:bg-red-600 dark:border-red-600 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800" data-dismiss-target="#alert-additional-content-2" aria-label="Close">
+              <button
+                type="button"
+                onClick={toggleErrorAlert}
+                className="text-red-800 bg-transparent border border-red-800 hover:bg-red-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center dark:hover:bg-red-600 dark:border-red-600 dark:text-red-500 dark:hover:text-white dark:focus:ring-red-800"
+                data-dismiss-target="#alert-additional-content-2"
+                aria-label="Close"
+              >
                 Dismiss
               </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 };

@@ -155,6 +155,7 @@ export const Web3Context = ({ children }) => {
         return data;
       } catch (error) {
         console.log("Error while donate: ", error);
+        return false;
       }
     }
   };
@@ -170,8 +171,10 @@ export const Web3Context = ({ children }) => {
       try {
         // Parse amount as Ether value
         await contract.widthdraw(id);
+        return true;
       } catch (error) {
         console.log("Error while widthdraw: ", error);
+        return false;
       }
     }
   };
@@ -186,8 +189,10 @@ export const Web3Context = ({ children }) => {
     if (contract) {
       try {
         await contract.returnFund(id);
+        return true;
       } catch (error) {
         console.log("Error while return fund", error);
+        return false;
       }
     }
   }

@@ -7,7 +7,7 @@ export const Modal = ({ isOpen, onCloseModal, children, background, textColor, d
     }
 
     return (
-        <div onClick={onCloseModal} tabIndex="-1" aria-hidden="true" className={`fixed inset-0 z-80 flex items-baseline justify-center overflow-x-hidden overflow-y-auto bg-black bg-opacity-50 sm:py-6 sm:px-4 sm:px-0 ${textColor ? textColor : "text-black"}`}>
+        <div onClick={onCloseModal} tabIndex="-1" aria-hidden="true" className={`fixed inset-0 z-50 flex items-baseline justify-center overflow-x-hidden overflow-y-auto bg-black bg-opacity-50 sm:py-6 sm:px-4 sm:px-0 ${textColor ? textColor : "text-black"}`}>
             <div className="bg-white dark:bg-gray-800 sm:max-w-lg sm:w-full rounded-xl shadow-sm">
                 {/* <!-- Modal content --> */}
                 <div className={`relative rounded-lg shadow ${background}`} onClick={(e) => { e.stopPropagation() }}>
