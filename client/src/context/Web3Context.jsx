@@ -42,6 +42,55 @@ export const Web3Context = ({ children }) => {
     }
   };
 
+  const getCampaignById = async (id) => {
+    const provider = new ethers.providers.JsonRpcProvider();
+    const newContract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      provider
+    );
+    if (newContract) {
+      try {
+        const campaign = await newContract.getCampaignById([id]);
+        console.log(`Campaign detail with id ${id} `, campaign);
+        const parsedResult = {
+          owner: campaign.owner,
+          title: campaign.title,
+          description: campaign.description,
+          target: ethers.utils.formatEther(campaign.target.toString()),
+          deadline: campaign.deadline.toNumber(),
+          collected: ethers.utils.formatEther(campaign.collected.toString()),
+          image: campaign.image,
+        };
+        return parsedResult;
+      } catch (error) {
+        console.error("Error getting campaign:", error);
+      }
+    } else {
+      console.error("Contract is not initialized yet.");
+    }
+  };
+
+  const getAllRecords = async () => {
+    const provider = new ethers.providers.JsonRpcProvider();
+    const newContract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      provider
+    );
+    if (newContract) {
+      try {
+        const allRecord = await newContract.getRecords();
+        console.log("All records:", allRecord);
+        return allRecord;
+      } catch (error) {
+        console.error("Error getting campaigns:", error);
+      }
+    } else {
+      console.error("Contract is not initialized yet.");
+    }
+  };
+
   const getAllCampaigns = async () => {
     const provider = new ethers.providers.JsonRpcProvider();
     const newContract = new ethers.Contract(
@@ -195,7 +244,7 @@ export const Web3Context = ({ children }) => {
         return false;
       }
     }
-  }
+  };
 
   const getDonations = async (id) => {
     const provider = new ethers.providers.JsonRpcProvider();
@@ -269,6 +318,8 @@ export const Web3Context = ({ children }) => {
         widthdraw,
         getDonations,
         returnFund,
+        getCampaignById,
+        getAllRecords,
       }}
     >
       {children}
