@@ -13,17 +13,35 @@ import { Modal } from "../components/Modal/Modal";
 const CampaignDetail = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { donate, getDonations, widthdraw, returnFund, contract, address } = useContext(Context);
-
+  const {
+    donate,
+    getDonations,
+    widthdraw,
+    returnFund,
+    getCampaignById,
+    getAllRecords,
+  } = useContext(Context);
+  const [campaign, setCampaign] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [amount, setAmount] = useState("");
   const [donators, setDonators] = useState([]);
-  const [isOpenWidthdrawResultModal, setIsOpenWidthdrawResultModal] = useState(false);
+  const [isOpenWidthdrawResultModal, setIsOpenWidthdrawResultModal] =
+    useState(false);
 
   useEffect(() => {
     getDonators();
-    console.log("State: ", state);
+    getCampaignDetail();
+    getAllRecords();
   }, []);
+
+  const getCampaignDetail = async () => {
+    try {
+      const data = await getCampaignById(state.id);
+      setCampaign(data);
+    } catch (error) {
+      console.log("Cannot get campaign detail");
+    }
+  };
 
   const getDonators = async () => {
     const data = await getDonations(state.id);
@@ -36,21 +54,23 @@ const CampaignDetail = () => {
     await donate(state.id, amount);
     setIsLoading(false);
     getDonators();
+    getCampaignDetail();
   };
 
   const handleWidthdraw = async () => {
     if (state.collected < state.target) {
       setIsOpenWidthdrawResultModal(true);
-    }
-    else {
+    } else {
       await widthdraw(state.id);
       setIsOpenWidthdrawResultModal(true);
     }
-  }
+    getCampaignDetail();
+  };
 
   const handleReturn = async () => {
     await returnFund(state.id);
-  }
+    getCampaignDetail();
+  };
 
   const remainingDays = daysLeft(state.deadline);
   return (
@@ -62,18 +82,21 @@ const CampaignDetail = () => {
           className="w-[100px] h-[100px] object-contain"
         />
       )}
-      {isOpenWidthdrawResultModal &&
+      {isOpenWidthdrawResultModal && (
         <WidthdrawResultModal
           title={"This is the title"}
           closeButton={true}
-          onCloseModal={() => { setIsOpenWidthdrawResultModal(false) }}
+          onCloseModal={() => {
+            setIsOpenWidthdrawResultModal(false);
+          }}
         >
           <h1>This is body</h1>
-        </WidthdrawResultModal>}
+        </WidthdrawResultModal>
+      )}
       <div className="w-full flex md:flex-row flex-col mt-10 gap-[30px]">
         <div className="flex-1 flex-col">
           <img
-            src={state.image}
+            src={campaign.image}
             alt="campaign"
             className="w-full h-[410px] object-cover rounded-xl"
           />
@@ -82,8 +105,8 @@ const CampaignDetail = () => {
               className="absolute h-full bg-[#4acd8d]"
               style={{
                 width: `${calculateBarPercentage(
-                  state.target,
-                  state.collected
+                  campaign.target,
+                  campaign.collected
                 )}%`,
                 maxWidth: "100%",
               }}
@@ -94,8 +117,8 @@ const CampaignDetail = () => {
         <div className="flex md:w-[150px] w-full flex-wrap justify-between gap-[30px]">
           <CountBox title="Thời gian còn lại" value={remainingDays} />
           <CountBox
-            title={`Mục tiêu ${state.collected} / ${state.target}`}
-            value={state.collected}
+            title={`Mục tiêu ${state.collected} / ${campaign.target}`}
+            value={campaign.collected}
           />
           <CountBox title="Người ủng hộ" value={0} />
         </div>
@@ -115,7 +138,7 @@ const CampaignDetail = () => {
               </div>
               <div>
                 <h4 className="font-semibold text-[14px]  break-all">
-                  {state.owner}
+                  {campaign.owner}
                 </h4>
                 <p className="mt-[4px] font-normal text-[12px] ">
                   20 Campaigns
@@ -128,7 +151,7 @@ const CampaignDetail = () => {
             <h4 className="font-semibold text-[18px] uppercase">Story</h4>
             <div className="mt-[20px]">
               <p className="mt-[4px] font-normal text-[16px]  leading-[26px] text-justify">
-                {state.description}
+                {campaign.description}
               </p>
             </div>
           </div>
@@ -152,13 +175,14 @@ const CampaignDetail = () => {
                   </thead>
                   <tbody>
                     {donators.map((item, index) => (
-                      <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700" key={`${item}-${index}`}>
+                      <tr
+                        className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
+                        key={`${item}-${index}`}
+                      >
                         <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                           {index + 1}. {item.donator}
                         </td>
-                        <td className="px-6 py-4">
-                          {item.donation} (ETH)
-                        </td>
+                        <td className="px-6 py-4">{item.donation} (ETH)</td>
                       </tr>
                     ))}
                   </tbody>
@@ -219,12 +243,11 @@ const CampaignDetail = () => {
                 styles="w-full mt-2 bg-red-500"
                 handleClick={handleReturn}
               />
-
             </div>
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 

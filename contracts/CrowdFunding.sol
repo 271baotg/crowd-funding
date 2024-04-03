@@ -14,9 +14,19 @@ contract CrowdFunding {
         uint256[] donations;
     }
 
+    struct Record {
+        address sender;
+        string tag;
+        uint256 target;
+        uint256 amount;
+        uint256 timestamp;
+    }
+
     mapping(uint256 => Campaign) public campaigns;
+    mapping(uint256 => Record) public records;
 
     uint256 public numberOfCampaign = 0;
+    uint256 public numberOfRecord = 0;
 
     function createCampaign(
         address _owner,
@@ -27,6 +37,7 @@ contract CrowdFunding {
         string memory _image
     ) public returns (uint256) {
         Campaign storage campaign = campaigns[numberOfCampaign];
+        Record storage record = records[numberOfRecord];
         require(
             campaign.deadline < block.timestamp,
             "The deadline must not be in the past !"
@@ -39,7 +50,14 @@ contract CrowdFunding {
         campaign.deadline = _deadline;
         campaign.image = _image;
 
+        record.sender = _owner;
+        record.tag = "create_campaign";
+        record.target = numberOfCampaign;
+        record.amount = 0;
+        record.timestamp = block.timestamp;
+
         numberOfCampaign++;
+        numberOfRecord++;
 
         return numberOfCampaign - 1;
     }
@@ -48,6 +66,15 @@ contract CrowdFunding {
         uint256 amount = msg.value;
 
         Campaign storage campaign = campaigns[_id];
+        Record storage record = records[numberOfRecord];
+
+        record.sender = msg.sender;
+        record.tag = "donate";
+        record.target = _id;
+        record.amount = msg.value;
+        record.timestamp = block.timestamp;
+
+        numberOfRecord++;
 
         campaign.donators.push(msg.sender);
         campaign.donations.push(amount);
@@ -68,6 +95,16 @@ contract CrowdFunding {
         );
     }
 
+    function getRecords() public view returns (Record[] memory) {
+        Record[] memory allRecords = new Record[](numberOfRecord);
+        for (uint i = 0; i < numberOfRecord; i++) {
+            Record storage item = records[i];
+            allRecords[i] = item;
+        }
+
+        return allRecords;
+    }
+
     function getCampaigns() public view returns (Campaign[] memory) {
         Campaign[] memory allCampaigns = new Campaign[](numberOfCampaign);
 
@@ -79,11 +116,26 @@ contract CrowdFunding {
         return allCampaigns;
     }
 
+    function getCampaignById(uint idx) public view returns (Campaign memory) {
+        Campaign storage item = campaigns[idx];
+        return item;
+    }
+
     function widthdraw(uint idx) public {
         require(idx < numberOfCampaign, "Contract index is not valid");
         Campaign storage camp = campaigns[idx];
         require(msg.sender == camp.owner, "Sender is not the owner");
+        Record storage record = records[numberOfRecord];
+
+        record.sender = msg.sender;
+        record.tag = "widthdraw";
+        record.target = idx;
+        record.amount = camp.collected;
+        record.timestamp = block.timestamp;
+
+        numberOfRecord++;
         payable(msg.sender).transfer(camp.collected);
+
         camp.collected -= camp.collected;
     }
 
