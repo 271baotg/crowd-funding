@@ -10,7 +10,8 @@ async function main() {
   const CrowdFunding = await ethers.getContractFactory("CrowdFunding");
   const contract = await CrowdFunding.deploy();
 
-  console.log("Contract deployed at:", contract.address);
+  // console.log("Contract deployed at:", contract.address);
+  console.log("Contract: ", contract.target);
 }
 main()
   .then(() => process.exit(0))

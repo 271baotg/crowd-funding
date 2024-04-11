@@ -42,6 +42,56 @@ export const Web3Context = ({ children }) => {
     }
   };
 
+  const getCampaignById = async (id) => {
+    const provider = new ethers.providers.JsonRpcProvider();
+    const newContract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      provider
+    );
+    if (newContract) {
+      try {
+        const campaign = await newContract.getCampaignById([id]);
+        console.log(`Campaign detail with id ${id} `, campaign);
+        const parsedResult = {
+          owner: campaign.owner,
+          title: campaign.title,
+          description: campaign.description,
+          target: ethers.utils.formatEther(campaign.target.toString()),
+          deadline: campaign.deadline.toNumber(),
+          collected: ethers.utils.formatEther(campaign.collected.toString()),
+          state: campaign.state,
+          image: campaign.image,
+        };
+        return parsedResult;
+      } catch (error) {
+        console.error("Error getting campaign:", error);
+      }
+    } else {
+      console.error("Contract is not initialized yet.");
+    }
+  };
+
+  const getAllRecords = async () => {
+    const provider = new ethers.providers.JsonRpcProvider();
+    const newContract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      provider
+    );
+    if (newContract) {
+      try {
+        const allRecord = await newContract.getRecords();
+        console.log("All records:", allRecord);
+        return allRecord;
+      } catch (error) {
+        console.error("Error getting campaigns:", error);
+      }
+    } else {
+      console.error("Contract is not initialized yet.");
+    }
+  };
+
   const getAllCampaigns = async () => {
     const provider = new ethers.providers.JsonRpcProvider();
     const newContract = new ethers.Contract(
@@ -62,6 +112,7 @@ export const Web3Context = ({ children }) => {
           collected: ethers.utils.formatEther(campaign.collected.toString()),
           image: campaign.image,
           id: i,
+          state: campaign.state,
         }));
         return parsedResult;
       } catch (error) {
@@ -93,6 +144,7 @@ export const Web3Context = ({ children }) => {
           deadline: campaign.deadline.toNumber(),
           collected: ethers.utils.formatEther(campaign.collected.toString()),
           image: campaign.image,
+          state: campaign.state,
           id: i,
         }));
 
@@ -127,8 +179,10 @@ export const Web3Context = ({ children }) => {
         form.image
       );
       console.log("Campaign succesfully created: ", newCampaign);
+      return true;
     } catch (error) {
       console.log("Campaign succesfully failure: ", error);
+      return false;
     }
   };
 
@@ -153,6 +207,44 @@ export const Web3Context = ({ children }) => {
         return data;
       } catch (error) {
         console.log("Error while donate: ", error);
+        return false;
+      }
+    }
+  };
+
+  const widthdraw = async (id) => {
+    // alert(id);
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      web3State.signer
+    );
+    if (contract) {
+      try {
+        // Parse amount as Ether value
+        await contract.widthdraw(id);
+        return true;
+      } catch (error) {
+        console.log("Error while widthdraw: ", error);
+        return false;
+      }
+    }
+  };
+
+  const returnFund = async (id) => {
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      web3State.signer
+    );
+
+    if (contract) {
+      try {
+        await contract.returnFund(id);
+        return true;
+      } catch (error) {
+        console.log("Error while return fund", error);
+        return false;
       }
     }
   };
@@ -226,7 +318,11 @@ export const Web3Context = ({ children }) => {
         getPersonalCampaigns,
         connectedWallet: currentAccount,
         donate,
+        widthdraw,
         getDonations,
+        returnFund,
+        getCampaignById,
+        getAllRecords,
       }}
     >
       {children}
