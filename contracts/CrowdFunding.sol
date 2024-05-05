@@ -8,6 +8,7 @@ contract CrowdFunding {
         ENDED
     }
 
+
     struct Campaign {
         address owner;
         string title;
@@ -24,6 +25,7 @@ contract CrowdFunding {
     struct Record {
         address sender;
         string tag;
+        bytes32 txHash;
         uint256 target;
         uint256 amount;
         uint256 timestamp;
@@ -34,6 +36,11 @@ contract CrowdFunding {
 
     uint256 public numberOfCampaign = 0;
     uint256 public numberOfRecord = 0;
+
+    function updateRecordHash(bytes32 _txHash) public {
+        Record storage record = records[numberOfRecord - 1];
+        record.txHash = _txHash;
+    }
 
     function createCampaign(
         address _owner,
@@ -59,7 +66,7 @@ contract CrowdFunding {
         campaign.state = CAMPAIGN_STATE.RUNNING;
 
         record.sender = _owner;
-        record.tag = "create_campaign";
+        record.tag = "CREATE";
         record.target = numberOfCampaign;
         record.amount = 0;
         record.timestamp = block.timestamp;
@@ -75,7 +82,7 @@ contract CrowdFunding {
         Record storage record = records[numberOfRecord];
 
         record.sender = msg.sender;
-        record.tag = "donate";
+        record.tag = "DONATE";
         record.target = _id;
         record.amount = msg.value;
         record.timestamp = block.timestamp;
@@ -141,7 +148,7 @@ contract CrowdFunding {
         Record storage record = records[numberOfRecord];
 
         record.sender = msg.sender;
-        record.tag = "widthdraw";
+        record.tag = "WIDTHDRAW";
         record.target = idx;
         record.amount = camp.collected;
         record.timestamp = block.timestamp;
@@ -168,6 +175,15 @@ contract CrowdFunding {
             uint256 amount = donations[i];
             payable(donator).transfer(amount);
             camp.collected -= amount;
+            Record storage record = records[numberOfRecord];
+
+            record.sender = donators[i];
+            record.tag = "REFUND";
+            record.target = idx;
+            record.amount = donations[i];
+            record.timestamp = block.timestamp;
+
+            numberOfRecord++;
         }
         camp.state = CAMPAIGN_STATE.ENDED;
     }

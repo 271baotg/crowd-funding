@@ -115,7 +115,7 @@ const CreateCampaign = () => {
           />
           <InputField
             labelName="Campaign title"
-            placeholder="Please enter your name"
+            placeholder="Please enter campaign title"
             inputType="text"
             value={form.title}
             handleChange={(e) => onChangeHandle("title", e)}

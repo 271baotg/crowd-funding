@@ -10,6 +10,7 @@ import Context from "../context/Web3Context";
 import { WidthdrawResultModal } from "../components/WidthdrawResultModal";
 import { Modal } from "../components/Modal/Modal";
 import { ReturnFundResultModal } from "../components/ReturnFundResultModal";
+import TrackingTable from "../components/TrackingTable";
 
 const CampaignDetail = () => {
   const { state } = useLocation();
@@ -24,9 +25,11 @@ const CampaignDetail = () => {
   } = useContext(Context);
   const [campaign, setCampaign] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isRendering, setIsRendering] = useState(false);
   const [amount, setAmount] = useState("");
   const [donators, setDonators] = useState([]);
-  const [isOpenWidthdrawResultModal, setIsOpenWidthdrawResultModal] = useState(false);
+  const [isOpenWidthdrawResultModal, setIsOpenWidthdrawResultModal] =
+    useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [status, setStatus] = useState("");
@@ -34,7 +37,8 @@ const CampaignDetail = () => {
   const [isOpenReturnFund, setIsOpenReturnFund] = useState(false);
   const [isWidthdraw, setIsWidthdraw] = useState(false);
   const [isReturnFund, setIsReturnFund] = useState(false);
-
+  const [listRecords, setListRecords] = useState([]);
+  const [currentRecords, setCurrentRecords] = useState([]);
 
   let campaignStateStyle = "";
   const setCampaignStyle = () => {
@@ -52,28 +56,92 @@ const CampaignDetail = () => {
         break;
       }
       default: {
-
+        break;
       }
     }
-  }
+  };
   setCampaignStyle();
 
-  let campaignStateElement = (<span className={campaignStateStyle}>{campaign.state == 0 ? "Chưa sẵn sàng" : (campaign.state == 1 ? "Đang mở" : "Đã kết thúc")}</span>);
+  let campaignStateElement = (
+    <span className={campaignStateStyle}>
+      {campaign.state == 0
+        ? "Chưa sẵn sàng"
+        : campaign.state == 1
+        ? "Đang mở"
+        : "Đã kết thúc"}
+    </span>
+  );
 
+  useEffect(() => {
+    setCurrentRecords(listRecords);
+  }, [listRecords]);
+
+  const [trackingData, setTrackingData] = useState([
+    {
+      category: "DONATE",
+      selected: true,
+      color: "bg-red-500",
+    },
+    {
+      category: "WIDTHDRAW",
+      selected: false,
+      color: "bg-yellow-500",
+    },
+    {
+      category: "REFUND",
+      selected: false,
+      color: "bg-green-500",
+    },
+    {
+      category: "CREATE",
+      selected: false,
+      color: "bg-blue-500",
+    },
+  ]);
+
+  const optionChange = (category) => {
+    const updatedTrackingData = trackingData.map((item) => {
+      if (item.category === category) {
+        return { ...item, selected: true };
+      }
+      return { ...item, selected: false };
+    });
+    setTrackingData(updatedTrackingData);
+    const filteredRecords = listRecords.filter((item) => {
+      return item.tag === category;
+    });
+
+    console.log("Filtered: ", filteredRecords);
+    setCurrentRecords(filteredRecords);
+  };
 
   useEffect(() => {
     getDonators();
     getCampaignDetail();
-    getAllRecords();
+    loadRecords();
   }, []);
 
   const getCampaignDetail = async () => {
+    setIsRendering(true);
     try {
       const data = await getCampaignById(state.id);
       console.log("Detail: ", data);
       setCampaign(data);
     } catch (error) {
       console.log("Cannot get campaign detail");
+    } finally {
+      setIsRendering(true);
+    }
+  };
+
+  const loadRecords = async () => {
+    try {
+      const data = await getAllRecords();
+      const filteredData = data.filter((item) => item.target === state.id);
+      setListRecords(filteredData);
+      console.log("Records: ", data);
+    } catch (error) {
+      console.log("Cannot get records");
     }
   };
 
@@ -119,8 +187,7 @@ const CampaignDetail = () => {
     if (campaign.collected < campaign.target) {
       setIsOpenWidthdrawResultModal(true);
       setIsWidthdraw(false);
-    }
-    else {
+    } else {
       const result = await widthdraw(state.id);
       if (result) {
         setIsWidthdraw(true);
@@ -142,18 +209,15 @@ const CampaignDetail = () => {
     }
     setIsOpenReturnFund(true);
     getCampaignDetail();
-
-  }
+  };
 
   const remainingDays = daysLeft(campaign.deadline);
   return (
     <div>
       <div className="mt-5 mb-2">
-        <h1 className="text-xl">
-          Trạng thái: &nbsp;{campaignStateElement}
-        </h1>
+        <h1 className="text-xl">Trạng thái: &nbsp;{campaignStateElement}</h1>
       </div>
-      {isOpenWidthdrawResultModal &&
+      {isOpenWidthdrawResultModal && (
         <WidthdrawResultModal
           title={"This is the title"}
           isWidthdraw={isWidthdraw}
@@ -164,18 +228,20 @@ const CampaignDetail = () => {
         >
           <h1>This is body</h1>
         </WidthdrawResultModal>
-      }
+      )}
 
-      {isOpenReturnFund &&
+      {isOpenReturnFund && (
         <ReturnFundResultModal
           title={"This is the title"}
           isReturnFund={isReturnFund}
           closeButton={true}
-          onCloseModal={() => { setIsOpenReturnFund(false) }}
+          onCloseModal={() => {
+            setIsOpenReturnFund(false);
+          }}
         >
           <h1>This is body</h1>
         </ReturnFundResultModal>
-      }
+      )}
 
       {isOpen && (
         <Modal
@@ -261,7 +327,9 @@ const CampaignDetail = () => {
             <div className="flex">
               <button
                 type="button"
-                onClick={() => { setIsSuccess(false) }}
+                onClick={() => {
+                  setIsSuccess(false);
+                }}
                 className="text-green-800 bg-transparent border border-green-800 hover:bg-green-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs px-3 py-1.5 text-center dark:hover:bg-green-600 dark:border-green-600 dark:text-green-400 dark:hover:text-white dark:focus:ring-green-800"
                 data-dismiss-target="#alert-additional-content-3"
                 aria-label="Close"
@@ -310,25 +378,46 @@ const CampaignDetail = () => {
       )}
 
       <div className="w-full flex md:flex-row flex-col mt-10 gap-[30px]">
-        <div className="flex-1 flex-col">
-          <img
-            src={campaign.image}
-            alt="campaign"
-            className="w-full h-[410px] object-cover rounded-xl"
-          />
-          <div className="relative w-full h-[20px] bg-[#ddd] mt-2 rounded-[10px] overflow-hidden">
+        {isRendering ? (
+          <>
             <div
-              className="absolute h-full bg-[#4acd8d]"
-              style={{
-                width: `${calculateBarPercentage(
-                  campaign.target,
-                  campaign.collected
-                )}%`,
-                maxWidth: "100%",
-              }}
-            ></div>
+              role="status"
+              className="flex items-center justify-center h-[410px] w-full bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700"
+            >
+              <svg
+                className="w-10 h-10 text-gray-200 dark:text-gray-600"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 16 20"
+              >
+                <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z" />
+                <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM9 13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2Zm4 .382a1 1 0 0 1-1.447.894L10 13v-2l1.553-1.276a1 1 0 0 1 1.447.894v2.764Z" />
+              </svg>
+              <span className="sr-only">Loading...</span>
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex-col">
+            <img
+              src={campaign.image}
+              alt="campaign"
+              className="w-full h-[410px] object-cover rounded-xl"
+            />
+            <div className="relative w-full h-[20px] bg-[#ddd] mt-2 rounded-[10px] overflow-hidden">
+              <div
+                className="absolute h-full bg-[#4acd8d]"
+                style={{
+                  width: `${calculateBarPercentage(
+                    campaign.target,
+                    campaign.collected
+                  )}%`,
+                  maxWidth: "100%",
+                }}
+              ></div>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex md:w-[150px] w-full flex-wrap justify-between gap-[30px]">
           <CountBox title="Thời gian còn lại" value={remainingDays} />
@@ -410,6 +499,18 @@ const CampaignDetail = () => {
               )}
             </div>
           </div>
+
+          {/* History */}
+          <div>
+            <h4 className="font-semibold text-[18px] uppercase">
+              Camapaign History
+            </h4>
+            <TrackingTable
+              records={currentRecords}
+              option={trackingData}
+              setOption={optionChange}
+            />
+          </div>
         </div>
 
         <div className="flex-1">
@@ -417,7 +518,9 @@ const CampaignDetail = () => {
             Fund
           </h4>
 
-          <div className={`mt-[20px] flex flex-col p-4 bg-[#4acd8d] rounded-[10px]`}>
+          <div
+            className={`mt-[20px] flex flex-col p-4 bg-[#4acd8d] rounded-[10px]`}
+          >
             <p className="font-epilogue fount-medium text-[20px] leading-[30px] font-semibold text-center text-[#fff]">
               Fund the campaign
             </p>
@@ -444,22 +547,35 @@ const CampaignDetail = () => {
               <CustomButton
                 btnType="button"
                 title="Fund Campaign"
-                handleClick={() => { setIsOpen(!isOpen) }
-                }
-                styles={`w-full mt-2  ${campaign.state != 1 ? `bg-[#E8E8E8] text-[#909090]` : `bg-[#c48c39]`}`}
+                handleClick={() => {
+                  setIsOpen(!isOpen);
+                }}
+                styles={`w-full mt-2  ${
+                  campaign.state != 1
+                    ? `bg-[#E8E8E8] text-[#909090]`
+                    : `bg-[#c48c39]`
+                }`}
                 isDisable={campaign.state == 1 ? false : true} //not ready = 0, running = 1, ended = 2
               />
               <CustomButton
                 btnType="button"
                 title="Widthdraw"
-                styles={`w-full mt-2  ${campaign.state != 1 ? "bg-[#E8E8E8] text-[#909090]" : `bg-[#284f52]`}`}
+                styles={`w-full mt-2  ${
+                  campaign.state != 1
+                    ? "bg-[#E8E8E8] text-[#909090]"
+                    : `bg-[#284f52]`
+                }`}
                 isDisable={campaign.state == 1 ? false : true}
                 handleClick={handleWidthdraw}
               />
               <CustomButton
                 btnType="button"
                 title="Return fund"
-                styles={`w-full mt-2  ${campaign.state != 1 ? "bg-[#E8E8E8] text-[#909090]" : `bg-red-500`}`}
+                styles={`w-full mt-2  ${
+                  campaign.state != 1
+                    ? "bg-[#E8E8E8] text-[#909090]"
+                    : `bg-red-500`
+                }`}
                 isDisable={campaign.state == 1 ? false : true}
                 handleClick={handleReturn}
               />

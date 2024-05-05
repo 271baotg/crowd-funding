@@ -8,7 +8,7 @@ import Profile from "./pages/Profile";
 import CreateCampaign from "./pages/CreateCampaign";
 import CampaignDetail from "./pages/CampaignDetail";
 import { Web3Context } from "./context/Web3Context";
-
+import History from "./pages/History";
 const App = () => {
   return (
     <Web3Context>
@@ -23,6 +23,7 @@ const App = () => {
             <Route path="/profile" element={<Profile />} />
             <Route path="/create-campaign" element={<CreateCampaign />} />
             <Route path="/campaign-details/:id" element={<CampaignDetail />} />
+            <Route path="/history" element={<History />} />
           </Routes>
         </div>
       </div>

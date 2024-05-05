@@ -3,6 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { loader } from "../assets";
 import FundCard from "./FundCard";
+import HeroCampaign from "./HeroCampaign";
 const CampaignList = ({ title, isLoading, data }) => {
   const navigate = useNavigate();
   const handleNavigate = (campaign) => {
@@ -11,11 +12,7 @@ const CampaignList = ({ title, isLoading, data }) => {
 
   return (
     <div>
-      <h1 className="font-semibold text text-[30px]">
-        {title} ({data.length})
-      </h1>
-
-      <div className="flex flex-wrap mt-[30px] gap-[20px]">
+      <div className="flex flex-col flex-wrap mt-[30px] gap-[20px]">
         {isLoading && (
           <img
             src={loader}
@@ -29,15 +26,28 @@ const CampaignList = ({ title, isLoading, data }) => {
             You have not created any campaigns
           </p>
         )}
-        {!isLoading &&
-          data.length > 0 &&
-          data.map((campaign, i) => (
-            <FundCard
-              key={campaign.id}
-              data={campaign}
-              handleClick={() => handleNavigate(campaign)}
-            ></FundCard>
-          ))}
+        {!isLoading && data.length > 0 && (
+          <HeroCampaign
+            data={data[0]}
+            handleClick={() => handleNavigate(data[0])}
+          ></HeroCampaign>
+        )}
+        <>
+          <h1 className="font-semibold text text-[30px]">
+            Featured Campaign:{" "}
+          </h1>
+          <div className="flex flex-row gap-6 flex-wrap">
+            {!isLoading &&
+              data.length > 0 &&
+              data.map((campaign, i) => (
+                <FundCard
+                  key={campaign.id}
+                  data={campaign}
+                  handleClick={() => handleNavigate(campaign)}
+                ></FundCard>
+              ))}
+          </div>
+        </>
       </div>
     </div>
   );

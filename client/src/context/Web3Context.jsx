@@ -2,12 +2,13 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import { ethers } from "ethers";
 import abi from "../../../artifacts/contracts/CrowdFunding.sol/CrowdFunding.json";
+import { timeAgo } from "../utils/index";
 
 const Context = createContext();
 
 export const Web3Context = ({ children }) => {
   // const contractAddress = "0x51D5385526FE0Cc8D87061898f6B14e6805A26D6";
-  const contractAddress = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
+  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
   const contractABI = abi.abi;
   const [web3State, setWeb3State] = useState({
     provider: null,
@@ -82,8 +83,17 @@ export const Web3Context = ({ children }) => {
     if (newContract) {
       try {
         const allRecord = await newContract.getRecords();
-        console.log("All records:", allRecord);
-        return allRecord;
+
+        const parsedRecords = allRecord.map((record, i) => ({
+          sender: `${record.sender.slice(0, 7)}...${record.sender.slice(38)}`,
+          target: record.target.toNumber(),
+          tag: record.tag,
+          txHash: `${record.txHash.slice(0, 7)}...${record.txHash.slice(61)}`,
+          timestamp: timeAgo(record.timestamp.toNumber()),
+          amount: ethers.utils.formatEther(record.amount.toString()),
+        }));
+        console.log("All records:", parsedRecords);
+        return parsedRecords;
       } catch (error) {
         console.error("Error getting campaigns:", error);
       }
@@ -176,8 +186,11 @@ export const Web3Context = ({ children }) => {
         form.description,
         form.target,
         new Date(form.deadline).getTime(),
-        form.image
+        form.image,
+        { gasLimit: 5000000 }
       );
+      console.log("Transaction hash:", newCampaign.hash);
+      await contract.updateRecordHash(newCampaign.hash);
       console.log("Campaign succesfully created: ", newCampaign);
       return true;
     } catch (error) {
@@ -200,11 +213,16 @@ export const Web3Context = ({ children }) => {
         console.log("id: ", id);
 
         // Parse amount as Ether value
-        const data = await contract.donateToCampaign([id], {
+        const tx = await contract.donateToCampaign([id], {
           value: ethers.utils.parseEther(amount.toString()),
         });
 
-        return data;
+        // Wait for the transaction to be mined
+        await tx.wait();
+
+        await contract.updateRecordHash(tx.hash);
+        console.log("Transaction hash:", tx.hash);
+        return tx;
       } catch (error) {
         console.log("Error while donate: ", error);
         return false;
@@ -222,7 +240,8 @@ export const Web3Context = ({ children }) => {
     if (contract) {
       try {
         // Parse amount as Ether value
-        await contract.widthdraw(id);
+        const tx = await contract.widthdraw(id);
+        await contract.updateRecordHash(tx.hash);
         return true;
       } catch (error) {
         console.log("Error while widthdraw: ", error);
