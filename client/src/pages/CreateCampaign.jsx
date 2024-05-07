@@ -71,12 +71,12 @@ const CreateCampaign = () => {
       }, 3000);
     } finally {
       setIsLoading(false);
-      form.title = "";
-      form.description = "";
-      form.name = "";
-      form.target = "";
-      form.image = "";
-      form.deadline = "";
+      // form.title = "";
+      // form.description = "";
+      // form.name = "";
+      // form.target = "";
+      // form.image = "";
+      // form.deadline = "";
       toggleModal(e);
     }
   };

@@ -7,8 +7,10 @@ import { timeAgo } from "../utils/index";
 const Context = createContext();
 
 export const Web3Context = ({ children }) => {
-  // const contractAddress = "0x51D5385526FE0Cc8D87061898f6B14e6805A26D6";
-  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+  const contractAddress = "0x7Fb79A3cbc5dd9e0B83cb9ee8c1f155f62EE88a2";
+  const rpcProvider =
+    "https://eth-sepolia.g.alchemy.com/v2/arSIfy6nQjfAu-XswmXvpb0rZDAgVl2d";
+  // const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
   const contractABI = abi.abi;
   const [web3State, setWeb3State] = useState({
     provider: null,
@@ -44,7 +46,7 @@ export const Web3Context = ({ children }) => {
   };
 
   const getCampaignById = async (id) => {
-    const provider = new ethers.providers.JsonRpcProvider();
+    const provider = new ethers.providers.JsonRpcProvider(rpcProvider);
     const newContract = new ethers.Contract(
       contractAddress,
       contractABI,
@@ -74,7 +76,7 @@ export const Web3Context = ({ children }) => {
   };
 
   const getAllRecords = async () => {
-    const provider = new ethers.providers.JsonRpcProvider();
+    const provider = new ethers.providers.JsonRpcProvider(rpcProvider);
     const newContract = new ethers.Contract(
       contractAddress,
       contractABI,
@@ -88,7 +90,7 @@ export const Web3Context = ({ children }) => {
           sender: `${record.sender.slice(0, 7)}...${record.sender.slice(38)}`,
           target: record.target.toNumber(),
           tag: record.tag,
-          txHash: `${record.txHash.slice(0, 7)}...${record.txHash.slice(61)}`,
+          txHash: record.txHash,
           timestamp: timeAgo(record.timestamp.toNumber()),
           amount: ethers.utils.formatEther(record.amount.toString()),
         }));
@@ -103,7 +105,7 @@ export const Web3Context = ({ children }) => {
   };
 
   const getAllCampaigns = async () => {
-    const provider = new ethers.providers.JsonRpcProvider();
+    const provider = new ethers.providers.JsonRpcProvider(rpcProvider);
     const newContract = new ethers.Contract(
       contractAddress,
       contractABI,
@@ -186,15 +188,15 @@ export const Web3Context = ({ children }) => {
         form.description,
         form.target,
         new Date(form.deadline).getTime(),
-        form.image,
-        { gasLimit: 5000000 }
+        form.image
       );
-      console.log("Transaction hash:", newCampaign.hash);
-      await contract.updateRecordHash(newCampaign.hash);
+      // const tx = await newCampaign.wait();
+      // console.log("Transaction hash:", tx.hash);
+      // await contract.updateRecordHash(tx.hash);
       console.log("Campaign succesfully created: ", newCampaign);
       return true;
     } catch (error) {
-      console.log("Campaign succesfully failure: ", error);
+      console.log("Campaign failure: ", error);
       return false;
     }
   };
@@ -217,11 +219,11 @@ export const Web3Context = ({ children }) => {
           value: ethers.utils.parseEther(amount.toString()),
         });
 
-        // Wait for the transaction to be mined
-        await tx.wait();
+        // // Wait for the transaction to be mined
+        // await tx.wait();
 
-        await contract.updateRecordHash(tx.hash);
-        console.log("Transaction hash:", tx.hash);
+        // await contract.updateRecordHash(tx.hash);
+        // console.log("Transaction hash:", tx.hash);
         return tx;
       } catch (error) {
         console.log("Error while donate: ", error);
@@ -269,7 +271,7 @@ export const Web3Context = ({ children }) => {
   };
 
   const getDonations = async (id) => {
-    const provider = new ethers.providers.JsonRpcProvider();
+    const provider = new ethers.providers.JsonRpcProvider(rpcProvider);
     const contract = new ethers.Contract(
       contractAddress,
       contractABI,

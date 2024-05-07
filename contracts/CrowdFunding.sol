@@ -84,7 +84,7 @@ contract CrowdFunding {
         record.sender = msg.sender;
         record.tag = "DONATE";
         record.target = _id;
-        record.amount = msg.value;
+        record.amount = msg.value; 
         record.timestamp = block.timestamp;
 
         numberOfRecord++;

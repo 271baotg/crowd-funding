@@ -44,8 +44,12 @@ const TrackingTable = ({ records, option, setOption }) => {
                     </a>
                   </td>
                   <td className="py-1 px-3 text-[12px] font-sans text-left border-t border-b border-gray-800 text-black">
-                    <a className="underline text-blue-400 cursor-pointer hover:underline-offset-2">
-                      {item.txHash}
+                    <a
+                      href={`https://sepolia.etherscan.io/tx/${item.txHash}`}
+                      className="underline text-blue-400 cursor-pointer hover:underline-offset-2"
+                    >
+                      {item.txHash &&
+                        `${item.txHash.slice(0, 7)}...${item.txHash.slice(60)}`}
                     </a>
                   </td>
                   <td className="py-1 px-3  font-semibold text-[12px] uppercase font-sans text-left border-t border-b border-gray-800 text-black">
